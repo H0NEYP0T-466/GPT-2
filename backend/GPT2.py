@@ -12,6 +12,7 @@ class CausalSelfAttention(nn.Module):
         self.c_proj = nn.Linear(config.n_embd, config.n_embd)
         self.n_head = config.n_head
         self.n_embd = config.n_embd
+        self.head_size = config.n_embd // config.n_head
         self.register_buffer("bias", torch.tril(torch.ones(config.block_size, config.block_size)).view(1, 1, config.block_size, config.block_size))
 
     def forward(self, x):
@@ -46,11 +47,11 @@ class MLP(nn.Module):
        
         return x
 
-class block(nn.Module):
+class Block(nn.Module):
     def __init__(self, config):
         super().__init__()
         self.ln_1 = nn.LayerNorm(config.n_embd)
-        self.attn = nn.MultiheadAttention(config.n_embd, config.n_head)
+        self.attn = CausalSelfAttention(config)
         self.ln_2 = nn.LayerNorm(config.n_embd)
         self.mlp = MLP(config)
 
@@ -75,31 +76,62 @@ class GPT2(nn.Module):
         self.transformer = nn.ModuleDict(dict(
             wte=nn.Embedding(config.vocab_size, config.n_embd),
             wpe=nn.Embedding(config.block_size, config.n_embd),
-            drop=nn.Dropout(0.1),
             h=nn.ModuleList([Block(config) for _ in range(config.n_layer)]),
             ln_f=nn.LayerNorm(config.n_embd),
         ))
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+        self.transformer.wte.weight = self.lm_head.weight
 
-    def forward(self, idx, targets=None):
-        device = idx.device
-        b, t = idx.size()
-        assert t <= self.config.block_size, "Cannot forward, model block size is exhausted."
-
-        # forward the GPT model itself
-        token_embeddings = self.transformer.wte(idx)  # each index maps to a (learnable) vector
-        position_embeddings = self.transformer.wpe(torch.arange(t, device=device))  # each position maps to a (learnable) vector
-        x = self.transformer.drop(token_embeddings + position_embeddings)
+    def forward(self, idx):
+        B,T =idx.size()
+        assert T <= self.config.block_size, "Cannot forward, model block size is exhausted."
+        pos = torch.arange(0, T, dtype=torch.long, device=idx.device).unsqueeze(0)  # shape (1, T)
+        tok_emb = self.transformer.wte(idx)  # token embeddings of shape (B, T, n_embd)
+        pos_emb = self.transformer.wpe(pos)  # position embeddings of shape (1, T, n_embd)  
+        x= tok_emb + pos_emb  # (B, T, n_embd)
         for block in self.transformer.h:
-            x = block(x)
-        x = self.transformer.ln_f(x)
+            x=block(x)
+        x=self.transformer.ln_f(x)
+        logits = self.lm_head(x)  # (B, T, vocab_size)
+        return logits
 
-        # output logits
-        logits = self.lm_head(x)
+    @classmethod
+    def from_pretrained(cls, model_name):
+        assert model_name in ['gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl'], "Model name must be one of: 'gpt2', 'gpt2-medium', 'gpt2-large', 'gpt2-xl'"
+        from transformers import GPT2LMHeadModel
+        print("Loading pre-trained model weights:", model_name)
+        config_args={
+            'gpt2': {'n_layer': 12, 'n_head': 12, 'n_embd': 768},
+            'gpt2-medium': {'n_layer': 24, 'n_head': 16, 'n_embd': 1024},
+            'gpt2-large': {'n_layer': 36, 'n_head': 20, 'n_embd': 1280},
+            'gpt2-xl': {'n_layer': 48, 'n_head': 25, 'n_embd': 1600}
+        }[model_name]
+        config_args['block_size'] = 1024
+        config_args['vocab_size'] = 50257
+        # Load the model configuration and weights from a pre-trained model
+        config = GPT2Config(**config_args)
+        model = cls(config)
+        sd=model.state_dict()
+        sd_keys=sd.keys()
+        sd_keys=[k for k in sd_keys if not k.endswith('.attn.bias')]
+        model_hf = GPT2LMHeadModel.from_pretrained(model_name)
+        sd_hf=model_hf.state_dict()
+        sd_keys_hf=sd_hf.keys()
+        sd_keys_hf=[k for k in sd_keys_hf if not k.endswith('.attn.bias')]
+        sd_keys_hf=[k for k in sd_keys_hf if not k.endswith('.attn.masked_bias')]
+        transposed=['attn.c_attn.weight', 'attn.c_proj.weight', 'mlp.c_fc.weight', 'mlp.c_proj.weight']
+        assert len(sd_keys)==len(sd_keys_hf), "State dict keys length mismatch"
+        for k, k_hf in zip(sd_keys, sd_keys_hf):
+            if any(k.endswith(w) for w in transposed):
+                assert sd_hf[k_hf].shape[::-1]==sd[k].shape
+                with torch.no_grad():
+                    sd[k].copy_(sd_hf[k_hf].t())
+            else:
+                assert sd_hf[k_hf].shape==sd[k].shape
+                with torch.no_grad():
+                    sd[k].copy_(sd_hf[k_hf])
+        return model
 
-        loss = None
-        if targets is not None:
-            # reshape logits and targets for loss computation
-            loss = f.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
 
-        return logits, loss
+model=GPT2.from_pretrained('gpt2')
+print("Model loaded successfully.")
