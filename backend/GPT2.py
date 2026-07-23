@@ -132,8 +132,6 @@ class GPT2(nn.Module):
                     sd[k].copy_(sd_hf[k_hf])
         return model
 
-
-
 num_return_sequences = 5
 max_length = 30
 model=GPT2.from_pretrained('gpt2')
