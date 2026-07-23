@@ -143,6 +143,7 @@ print("Model loaded successfully.")
 import tiktoken
 encoding = tiktoken.get_encoding("gpt2")
 tokens = torch.tensor(encoding.encode("Once upon a time, in a land far, far away,"), dtype=torch.long).unsqueeze(0).to(device)
+tokens = tokens.repeat(num_return_sequences, 1)  # Repeat the input tokens to create a batch of size 1
 x=tokens.to(device)
 torch.manual_seed(42)
 torch.cuda.manual_seed(42)
@@ -157,6 +158,6 @@ while x.size(1) < max_length:
 
 
 for i in range(num_return_sequences):
-    generated_sequence = x[0].tolist()
+    generated_sequence = x[i].tolist()
     generated_text = encoding.decode(generated_sequence)
     print(f"Generated Sequence {i+1}: {generated_text}")
