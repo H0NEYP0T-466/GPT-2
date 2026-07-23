@@ -133,5 +133,32 @@ class GPT2(nn.Module):
         return model
 
 
+
+num_return_sequences = 5
+max_length = 30
 model=GPT2.from_pretrained('gpt2')
+model.eval()
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+model.to(device)
 print("Model loaded successfully.")
+
+import tiktoken
+encoding = tiktoken.get_encoding("gpt2")
+tokens = torch.tensor(encoding.encode("Once upon a time, in a land far, far away,"), dtype=torch.long).unsqueeze(0).to(device)
+x=tokens.to(device)
+torch.manual_seed(42)
+torch.cuda.manual_seed(42)
+
+while x.size(1) < max_length:
+    with torch.no_grad():
+        logits = model(x)
+        logits = logits[:, -1, :]  # focus on the last time step
+        probs = f.softmax(logits, dim=-1)  # convert to probabilities
+        next_token = torch.multinomial(probs, num_samples=1)  # sample from the distribution
+        x = torch.cat((x, next_token), dim=1)  # append sampled token to the sequence
+
+
+for i in range(num_return_sequences):
+    generated_sequence = x[0].tolist()
+    generated_text = encoding.decode(generated_sequence)
+    print(f"Generated Sequence {i+1}: {generated_text}")
