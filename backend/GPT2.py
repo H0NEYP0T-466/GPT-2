@@ -4,6 +4,9 @@ import torch.nn as nn
 from torch.nn import functional as f
 
 
+datasetPath="../dataset/input.txt"
+
+
 class CausalSelfAttention(nn.Module):
     def __init__(self, config):
         super().__init__()
@@ -127,7 +130,7 @@ class GPT2(nn.Module):
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k_hf].t())
             else:
-                assert sd_hf[k_hf].shape==sd[k].shape
+                assert sd_hf[k_hf].shape==sd[k].shap
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k_hf])
         return model
@@ -139,6 +142,7 @@ model.eval()
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 model.to(device)
 print("Model loaded successfully.")
+
 
 import tiktoken
 encoding = tiktoken.get_encoding("gpt2")
@@ -161,3 +165,11 @@ for i in range(num_return_sequences):
     generated_sequence = x[i].tolist()
     generated_text = encoding.decode(generated_sequence)
     print(f"Generated Sequence {i+1}: {generated_text}")
+
+
+
+with open(datasetPath, 'w') as f:
+    for i in range(num_return_sequences):
+        generated_sequence = x[i].tolist()
+        generated_text = encoding.decode(generated_sequence)
+        f.write(f"Generated Sequence {i+1}: {generated_text}\n")
