@@ -4,7 +4,7 @@ import torch.nn as nn
 from torch.nn import functional as f
 
 
-datasetPath="../dataset/input.txt"
+datasetPath="./dataset/input.txt"
 
 
 class CausalSelfAttention(nn.Module):
@@ -137,7 +137,7 @@ class GPT2(nn.Module):
 
 num_return_sequences = 5
 max_length = 30
-model=GPT2.from_pretrained('gpt2')
+model=GPT2(GPT2Config())
 model.eval()
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 model.to(device)
@@ -167,9 +167,8 @@ for i in range(num_return_sequences):
     print(f"Generated Sequence {i+1}: {generated_text}")
 
 
-
-with open(datasetPath, 'w') as f:
-    for i in range(num_return_sequences):
-        generated_sequence = x[i].tolist()
-        generated_text = encoding.decode(generated_sequence)
-        f.write(f"Generated Sequence {i+1}: {generated_text}\n")
+#print the datset first 100 chars
+with open(datasetPath, 'r', encoding='utf-8') as f:
+    dataset_content = f.read()
+    print("First 100 characters of the dataset:")
+    print(dataset_content[:100])
