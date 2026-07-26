@@ -85,7 +85,7 @@ class GPT2(nn.Module):
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
         self.transformer.wte.weight = self.lm_head.weight
 
-    def forward(self, idx):
+    def forward(self, idx,target=None):
         B,T =idx.size()
         assert T <= self.config.block_size, "Cannot forward, model block size is exhausted."
         pos = torch.arange(0, T, dtype=torch.long, device=idx.device).unsqueeze(0)  # shape (1, T)
@@ -96,7 +96,11 @@ class GPT2(nn.Module):
             x=block(x)
         x=self.transformer.ln_f(x)
         logits = self.lm_head(x)  # (B, T, vocab_size)
-        return logits
+        loss=None
+        if target is not None:
+            loss=f.cross_entropy(logits.view(-1, logits.size(-1)), target.view(-1), ignore_index=-1)  
+
+        return logits,loss
 
     @classmethod
     def from_pretrained(cls, model_name):
@@ -172,3 +176,27 @@ with open(datasetPath, 'r', encoding='utf-8') as f:
     dataset_content = f.read()
     print("First 100 characters of the dataset:")
     print(dataset_content[:100])
+
+encoding=tiktoken.get_encoding("gpt2")
+tokens=encoding.encode(dataset_content)
+B, T =4, 32
+buf=torch.tensor(tokens[:B*T], dtype=torch.long).view(B, T)
+buf=buf.to(device)
+x=buf[:-1].view(B, T)
+y=buf[1:].view(B, T)
+
+model=GPT2(GPT2Config())
+model.to(device)
+optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
+for i in range(50):
+    optimizer.grad_zero()
+    logits, loss = model(x, y)
+    loss.backward()
+    optimizer.step()
+    print(f"Iteration {i+1}, Loss: {loss.item()}")
+
+#logits,loss=model(x,y)
+
+print(loss)
+import sys 
+sys.exit(0)
