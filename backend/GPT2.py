@@ -172,29 +172,47 @@ for i in range(num_return_sequences):
     print(f"Generated Sequence {i+1}: {generated_text}")
 """
 
-#print the datset first 100 chars
-with open(datasetPath, 'r', encoding='utf-8') as file:
-    dataset_content = file.read()
-    dataset_content=dataset_content[:1000]
-    print("First 100 characters of the dataset:")
-    print(dataset_content[:100])
-    print("Total characters in the dataset:", len(dataset_content))
 import tiktoken
+class DataLoader:
+    def __init__(self , B,T):
+        self.B=B
+        self.T=T
+
+        with open(datasetPath, 'r', encoding='utf-8') as file:
+            dataset_content = file.read()
+
+        enc=tiktoken.get_encoding("gpt2")
+        tokens=enc.encode(dataset_content)
+        self.tokens=torch.tensor(tokens)
+        print("Dataset loaded successfully. Total tokens:", len(self.tokens))
+        print("1 epoch will take", len(self.tokens)//(B*T), "iterations")
+
+        self.current_position=0
+
+    def next_batch(self):
+        B,T=self.B,self.T
+        buf=self.tokens[self.current_position:self.current_position+B*T+1]
+        x = buf[:-1].view(B, T)
+        y = buf[1:].view(B, T)
+        self.current_position += B*T
+        if self.current_position + B*T + 1 > len(self.tokens):
+            self.current_position = 0  # Reset to the beginning if we reach the end of the dataset
+        return x, y
+
+
+
+
 device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
-enc=tiktoken.get_encoding("gpt2")
-tokens=enc.encode(dataset_content)
-B, T =4, 32
-buf = torch.tensor(tokens[:B*T + 1], dtype=torch.long)
-buf=buf.to(device)
-x = buf[:-1].view(B, T)
-y = buf[1:].view(B, T)
-print(x)
-print(y)
+
+train_loader = DataLoader(B=4, T=32)
+
 model=GPT2(GPT2Config())
 model.to(device)
 model.train()
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 for i in range(50):
+    x, y = train_loader.next_batch()
+    x, y = x.to(device), y.to(device)
     optimizer.zero_grad()
     logits, loss = model(x, y)
     loss.backward()
