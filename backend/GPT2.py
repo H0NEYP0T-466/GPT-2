@@ -134,12 +134,12 @@ class GPT2(nn.Module):
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k_hf].t())
             else:
-                assert sd_hf[k_hf].shape==sd[k].shap
+                assert sd_hf[k_hf].shape==sd[k].shape
                 with torch.no_grad():
                     sd[k].copy_(sd_hf[k_hf])
         return model
 
-num_return_sequences = 5
+"""num_return_sequences = 5
 max_length = 30
 model=GPT2(GPT2Config())
 model.eval()
@@ -154,11 +154,12 @@ tokens = torch.tensor(encoding.encode("Once upon a time, in a land far, far away
 tokens = tokens.repeat(num_return_sequences, 1)  # Repeat the input tokens to create a batch of size 1
 x=tokens.to(device)
 torch.manual_seed(42)
-torch.cuda.manual_seed(42)
+if torch.cuda.is_available():
+    torch.cuda.manual_seed(42)
 
 while x.size(1) < max_length:
     with torch.no_grad():
-        logits = model(x)
+        logits, loss = model(x)
         logits = logits[:, -1, :]  # focus on the last time step
         probs = f.softmax(logits, dim=-1)  # convert to probabilities
         next_token = torch.multinomial(probs, num_samples=1)  # sample from the distribution
@@ -169,27 +170,32 @@ for i in range(num_return_sequences):
     generated_sequence = x[i].tolist()
     generated_text = encoding.decode(generated_sequence)
     print(f"Generated Sequence {i+1}: {generated_text}")
-
+"""
 
 #print the datset first 100 chars
-with open(datasetPath, 'r', encoding='utf-8') as f:
-    dataset_content = f.read()
+with open(datasetPath, 'r', encoding='utf-8') as file:
+    dataset_content = file.read()
+    dataset_content=dataset_content[:1000]
     print("First 100 characters of the dataset:")
     print(dataset_content[:100])
-
-encoding=tiktoken.get_encoding("gpt2")
-tokens=encoding.encode(dataset_content)
+    print("Total characters in the dataset:", len(dataset_content))
+import tiktoken
+device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+enc=tiktoken.get_encoding("gpt2")
+tokens=enc.encode(dataset_content)
 B, T =4, 32
-buf=torch.tensor(tokens[:B*T], dtype=torch.long).view(B, T)
+buf = torch.tensor(tokens[:B*T + 1], dtype=torch.long)
 buf=buf.to(device)
-x=buf[:-1].view(B, T)
-y=buf[1:].view(B, T)
-
+x = buf[:-1].view(B, T)
+y = buf[1:].view(B, T)
+print(x)
+print(y)
 model=GPT2(GPT2Config())
 model.to(device)
+model.train()
 optimizer = torch.optim.AdamW(model.parameters(), lr=3e-4)
 for i in range(50):
-    optimizer.grad_zero()
+    optimizer.zero_grad()
     logits, loss = model(x, y)
     loss.backward()
     optimizer.step()
