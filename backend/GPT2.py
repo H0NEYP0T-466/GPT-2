@@ -83,7 +83,21 @@ class GPT2(nn.Module):
             ln_f=nn.LayerNorm(config.n_embd),
         ))
         self.lm_head = nn.Linear(config.n_embd, config.vocab_size, bias=False)
+        #weight sharing thing i didnt understand it then but now i got it.
+        #is it just the encoder and decoder sharing the same weights? yes it is. the embedding layer and the output layer share the same weights.
         self.transformer.wte.weight = self.lm_head.weight
+
+        self.apply(self._init_weights)
+    def _init_weights(self, module):
+        if isinstance(module, nn.Linear):
+            nn.init.normal_(module.weight, mean=0.0, std=0.01)
+            if module.bias is not None:
+                nn.init.zeros_(module.bias)
+        elif isinstance(module, nn.Embedding):
+            nn.init.normal_(module.weight, mean=0.0, std=0.02)
+        elif isinstance(module, nn.LayerNorm):
+            nn.init.ones_(module.weight)
+            nn.init.zeros_(module.bias)
 
     def forward(self, idx,target=None):
         B,T =idx.size()
@@ -219,7 +233,7 @@ for i in range(50):
     optimizer.step()
     print(f"Iteration {i+1}, Loss: {loss.item()}")
 
-#logits,loss=model(x,y)
+#logits,loss=model(x,y)fc
 
 print(loss)
 import sys 
