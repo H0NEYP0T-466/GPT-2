@@ -1,0 +1,58 @@
+name: "Feature request"
+description: "Propose an enhancement for GPT-2"
+labels: ["enhancement"]
+title: "[Feature]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for your interest in improving GPT-2! Before submitting, please check the [existing issues](https://github.com/H0NEYP0T-466/GPT-2/issues) and [discussions](https://github.com/H0NEYP0T-466/GPT-2/discussions) to see if this has already been proposed.
+  - type: textarea
+    id: problem-statement
+    attributes:
+      label: Problem Statement
+      description: What problem are you trying to solve? Why is this feature needed?
+      placeholder: e.g., Currently there is no way to save generation history, making it hard to compare outputs across runs.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Proposed Solution
+      description: Describe your proposed solution in detail. How would it work? What would the user experience look like?
+      placeholder: Add an "Export history" button that downloads all generations as a JSON file.
+    validations:
+      required: true
+  - type: textarea
+    id: alternatives-considered
+    attributes:
+      label: Alternatives Considered
+      description: Have you thought of alternative approaches? Why did you prefer this one?
+      placeholder: e.g., We could also store history in localStorage, but that limits sharing across devices.
+    validations:
+      required: false
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope / Out of Scope
+      description: What is included in this feature, and what is explicitly not included?
+      placeholder: |
+        - In scope: Export history as JSON, clear history button
+        - Out of scope: Cloud sync, collaboration features
+    validations:
+      required: true
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & Considerations
+      description: Are there any potential risks, breaking changes, or performance concerns?
+      placeholder: e.g., Large history exports could block the main thread; consider using a web worker.
+    validations:
+      required: false
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other information, mockups, references, or examples that would help us understand your proposal.
+    validations:
+      required: false
