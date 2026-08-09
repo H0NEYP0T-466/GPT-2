@@ -24,3 +24,7 @@ dist-ssr
 *.sw?
 
 backend/venv/
+backend/model/model.pt
+backend/model/model_best.pt
+backend/training_log.json
+backend/data.txt
