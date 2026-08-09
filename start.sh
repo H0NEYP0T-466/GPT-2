@@ -23,7 +23,7 @@ echo "Installing Python dependencies..."
 pip install -q -r "$SCRIPT_DIR/backend/requirements.txt"
 
 # Start FastAPI backend in background
-echo "Starting FastAPI backend on port 8000..."
+echo "Starting FastAPI backend on port 8011..."
 cd "$SCRIPT_DIR/backend"
 python app.py &
 BACKEND_PID=$!
@@ -32,7 +32,7 @@ echo "Backend PID: $BACKEND_PID"
 # Wait for backend to be ready
 echo "Waiting for backend..."
 for i in {1..30}; do
-    if curl -s http://localhost:8000/api/health > /dev/null 2>&1; then
+    if curl -s http://localhost:8011/api/health > /dev/null 2>&1; then
         echo "Backend ready!"
         break
     fi
@@ -49,8 +49,8 @@ echo "Frontend PID: $FRONTEND_PID"
 echo ""
 echo "=== Services Running ==="
 echo "Frontend: http://localhost:5173"
-echo "Backend:  http://localhost:8000"
-echo "API Docs: http://localhost:8000/docs"
+echo "Backend:  http://localhost:8011"
+echo "API Docs: http://localhost:8011/docs"
 echo ""
 echo "Press Ctrl+C to stop both services"
 

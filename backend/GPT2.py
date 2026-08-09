@@ -292,11 +292,11 @@ def main():
     WEIGHT_DECAY = 0.1
     GRAD_CLIP = 1.0
     EPOCHS = 20
-    WARMUP_RATIO = 0.05   # 5% of total steps for warmup
+    WARMUP_RATIO = 0.03   # 3% of total steps for warmup
     VAL_RATIO = 0.1       # 10% validation split
-    EVAL_INTERVAL = 50    # evaluate every N steps
-    LOG_INTERVAL = 10     # print loss every N steps
-    SAMPLE_INTERVAL = 200 # generate sample text every N steps
+    EVAL_INTERVAL = 5     # evaluate every N steps
+    LOG_INTERVAL = 1      # print loss every N steps
+    SAMPLE_INTERVAL = 10  # generate sample text every N steps
     GRAD_ACCUM_STEPS = 4  # gradient accumulation (effective batch = 64)
 
     # --- Device ---

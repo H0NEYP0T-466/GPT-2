@@ -1,113 +1,192 @@
+/* ============================================================
+   Claude (Anthropic) Design System — Tokens
+   ============================================================ */
+:root {
+  /* Brand */
+  --accent: #c96442;
+  --accent-hover: #b55536;
+  --accent-light: rgba(201, 100, 66, 0.1);
+
+  /* Surfaces */
+  --bg: #f5f4ed;
+  --bg-panel: #faf9f5;
+  --bg-input: #ffffff;
+  --bg-hover: #e8e6dc;
+
+  /* Text */
+  --text: #141413;
+  --text-dim: #5e5d59;
+  --text-muted: #87867f;
+  --text-on-dark: #faf9f5;
+  --text-muted-on-dark: #b0aea5;
+
+  /* Borders */
+  --border: #f0eee6;
+  --border-warm: #e8e6dc;
+
+  /* Semantic */
+  --green: #2d8a39;
+  --red: #b53333;
+  --yellow: #c98a33;
+
+  /* Rings (depth via ring shadows, not drop shadows) */
+  --ring-warm: #d1cfc5;
+  --ring-focus: #3898ec;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-full: 32px;
+
+  /* Typography */
+  --serif: Georgia, "Times New Roman", serif;
+  --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+  --mono: "SF Mono", "Fira Code", Consolas, monospace;
+}
+
+/* ============================================================
+   Global Reset & Base
+   ============================================================ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: var(--sans);
+  background: var(--bg);
+  color: var(--text);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ============================================================
+   Layout
+   ============================================================ */
 .app {
-  max-width: 1200px;
+  max-width: 720px;
   margin: 0 auto;
-  padding: 24px;
+  padding: 48px 24px 64px;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   min-height: 100vh;
 }
 
-/* Header */
+/* ============================================================
+   Header
+   ============================================================ */
 .header {
   text-align: center;
-  padding: 32px 0 16px;
+  padding: 40px 0 24px;
 }
 
 .header h1 {
+  font-family: var(--serif);
   font-size: 48px;
-  font-weight: 700;
-  letter-spacing: -2px;
+  font-weight: 500;
+  letter-spacing: -1px;
   color: var(--text);
   margin: 0;
-  font-family: var(--mono);
+  line-height: 1.1;
 }
 
 .subtitle {
-  color: var(--text-dim);
+  font-family: var(--sans);
   font-size: 16px;
-  margin-top: 8px;
+  color: var(--text-dim);
+  margin-top: 10px;
+  line-height: 1.5;
 }
 
 .status-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 12px;
+  margin-top: 16px;
   padding: 6px 14px;
   border-radius: 20px;
-  font-size: 13px;
   font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.5px;
 }
 
 .status-badge.online {
-  background: rgba(74, 222, 128, 0.1);
+  background: rgba(45, 138, 57, 0.08);
   color: var(--green);
-  border: 1px solid rgba(74, 222, 128, 0.2);
+  border: 1px solid rgba(45, 138, 57, 0.15);
 }
 
 .status-badge.offline {
-  background: rgba(248, 113, 113, 0.1);
+  background: rgba(181, 51, 51, 0.08);
   color: var(--red);
-  border: 1px solid rgba(248, 113, 113, 0.2);
+  border: 1px solid rgba(181, 51, 51, 0.15);
 }
 
 .device {
-  opacity: 0.7;
+  opacity: 0.6;
 }
 
-/* Model Info Bar */
+/* ============================================================
+   Model Info Bar
+   ============================================================ */
 .model-info-bar {
   display: flex;
-  gap: 16px;
+  gap: 12px;
   justify-content: center;
-  padding: 10px 16px;
+  flex-wrap: wrap;
+  padding: 12px 16px;
   background: var(--bg-panel);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   font-family: var(--mono);
-  font-size: 13px;
-  color: var(--text-dim);
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 0.3px;
 }
 
 .model-info-bar span {
   padding: 2px 8px;
   background: var(--bg-input);
   border-radius: 4px;
+  border: 1px solid var(--border);
 }
 
-/* Panels */
-.panels {
-  display: grid;
-  grid-template-columns: 1fr 380px;
-  gap: 20px;
-  flex: 1;
-}
-
-@media (max-width: 900px) {
-  .panels {
-    grid-template-columns: 1fr;
-  }
-}
-
+/* ============================================================
+   Panel
+   ============================================================ */
 .panel {
   background: var(--bg-panel);
   border: 1px solid var(--border);
-  border-radius: var(--radius);
-  padding: 24px;
+  border-radius: var(--radius-lg);
+  padding: 32px;
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 }
 
 .panel h2 {
-  font-size: 18px;
-  font-weight: 600;
+  font-family: var(--serif);
+  font-size: 24px;
+  font-weight: 500;
   color: var(--text);
   margin: 0;
+  line-height: 1.2;
 }
 
-/* Input Groups */
+/* ============================================================
+   Inputs
+   ============================================================ */
 .input-group {
   display: flex;
   flex-direction: column;
@@ -115,65 +194,80 @@
 }
 
 .input-group label {
-  font-size: 13px;
-  color: var(--text-dim);
+  font-family: var(--sans);
+  font-size: 12px;
   font-weight: 500;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
 }
 
 .input-group textarea,
 .input-group input {
   background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 10px 12px;
+  border-radius: var(--radius-lg);
+  padding: 12px 14px;
   color: var(--text);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 14px;
   outline: none;
-  transition: border-color 0.2s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   resize: vertical;
+  line-height: 1.5;
 }
 
 .input-group textarea:focus,
 .input-group input:focus {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px var(--accent-glow);
+  border-color: var(--ring-focus);
+  box-shadow: 0 0 0 3px rgba(56, 152, 236, 0.12);
 }
 
 .input-group textarea {
   font-family: var(--mono);
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.6;
 }
 
-.controls-row {
-  display: flex;
-  gap: 12px;
-}
-
-.controls-row .input-group.small {
+.input-group.small {
   flex: 1;
 }
 
 .input-group.small input {
   width: 100%;
-  box-sizing: border-box;
 }
 
-/* Buttons */
+/* ============================================================
+   Controls Row
+   ============================================================ */
+.controls-row {
+  display: flex;
+  gap: 12px;
+}
+
+/* ============================================================
+   Buttons
+   ============================================================ */
 .button-row {
   display: flex;
   gap: 10px;
+  flex-wrap: wrap;
 }
 
 .btn {
   padding: 10px 20px;
   border: none;
-  border-radius: 6px;
+  border-radius: var(--radius-lg);
+  font-family: var(--sans);
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.15s;
-  font-family: var(--sans);
+  outline: none;
+}
+
+.btn:focus-visible {
+  box-shadow: 0 0 0 3px var(--ring-focus);
 }
 
 .btn:disabled {
@@ -181,47 +275,57 @@
   cursor: not-allowed;
 }
 
+/* Primary — Terracotta brand */
 .btn.primary {
   background: var(--accent);
-  color: white;
+  color: var(--text-on-dark);
+  box-shadow: 0 0 0 1px var(--accent);
 }
 
 .btn.primary:hover:not(:disabled) {
   background: var(--accent-hover);
+  box-shadow: 0 0 0 1px var(--accent-hover);
   transform: translateY(-1px);
 }
 
+.btn.primary:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+/* Secondary — Warm Sand */
 .btn.secondary {
-  background: var(--bg-input);
+  background: var(--bg-hover);
   color: var(--text);
   border: 1px solid var(--border);
 }
 
 .btn.secondary:hover:not(:disabled) {
-  background: var(--bg-hover);
-  border-color: var(--accent);
+  background: var(--border-warm);
+  border-color: var(--text-muted);
 }
 
-/* Output */
+/* ============================================================
+   Output
+   ============================================================ */
 .output {
   flex: 1;
-  min-height: 300px;
-  max-height: 600px;
+  min-height: 280px;
+  max-height: 560px;
   overflow-y: auto;
-  background: var(--bg);
+  background: var(--bg-input);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 16px;
+  border-radius: var(--radius-lg);
+  padding: 20px;
   font-family: var(--mono);
-  font-size: 14px;
-  line-height: 1.6;
+  font-size: 13px;
+  line-height: 1.7;
 }
 
 .generation {
-  padding: 12px;
-  margin-bottom: 8px;
+  padding: 14px 16px;
+  margin-bottom: 10px;
   background: var(--bg-panel);
-  border-radius: 6px;
+  border-radius: var(--radius);
   border-left: 3px solid var(--accent);
 }
 
@@ -231,21 +335,25 @@
 
 .generation-label {
   display: block;
-  font-size: 11px;
-  color: var(--text-dim);
+  font-family: var(--sans);
+  font-size: 10px;
+  color: var(--text-muted);
   margin-bottom: 4px;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.6px;
+  font-weight: 500;
 }
 
 .generation-text {
   white-space: pre-wrap;
   word-break: break-word;
+  color: var(--text);
 }
 
 .cursor {
   animation: blink 1s infinite;
   color: var(--yellow);
+  font-weight: bold;
 }
 
 @keyframes blink {
@@ -254,106 +362,27 @@
 }
 
 .placeholder {
-  color: var(--text-dim);
+  color: var(--text-muted);
   text-align: center;
-  padding: 40px 20px;
+  padding: 48px 24px;
   font-size: 14px;
-  line-height: 1.6;
+  line-height: 1.7;
+  font-style: italic;
 }
 
-/* Training Panel */
-.train-desc {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.5;
-}
-
-.train-progress {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.progress-bar {
-  height: 6px;
-  background: var(--bg-input);
-  border-radius: 3px;
-  overflow: hidden;
-}
-
-.progress-fill {
-  height: 100%;
-  background: var(--accent);
-  border-radius: 3px;
-  transition: width 0.3s;
-}
-
-.loss {
-  font-family: var(--mono);
-  font-size: 13px;
-  color: var(--text-dim);
-}
-
-/* Loss Chart */
-.loss-chart h3 {
-  font-size: 14px;
-  color: var(--text-dim);
-  margin-bottom: 8px;
-}
-
-.chart {
-  display: flex;
-  align-items: flex-end;
-  gap: 2px;
-  height: 120px;
-  padding: 8px 0;
-}
-
-.chart .bar {
-  flex: 1;
-  min-width: 3px;
-  background: var(--accent);
-  border-radius: 2px 2px 0 0;
-  transition: height 0.3s;
-}
-
-.chart-labels {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  color: var(--text-dim);
-  font-family: var(--mono);
-}
-
-.dataset-info {
-  margin-top: auto;
-  padding-top: 16px;
-  border-top: 1px solid var(--border);
-}
-
-.dataset-info h3 {
-  font-size: 14px;
-  color: var(--text-dim);
-  margin-bottom: 4px;
-}
-
-.dataset-info p {
-  font-size: 13px;
-  color: var(--text-dim);
-  line-height: 1.5;
-}
-
-/* Footer */
+/* ============================================================
+   Footer
+   ============================================================ */
 .footer {
   text-align: center;
-  padding: 16px 0;
-  border-top: 1px solid var(--border);
+  padding: 24px 0 0;
   margin-top: auto;
+  border-top: 1px solid var(--border);
 }
 
 .footer p {
-  font-size: 13px;
-  color: var(--text-dim);
+  font-size: 12px;
+  color: var(--text-muted);
 }
 
 .footer a {
@@ -365,13 +394,15 @@
   text-decoration: underline;
 }
 
-/* Scrollbar */
+/* ============================================================
+   Scrollbar
+   ============================================================ */
 .output::-webkit-scrollbar {
   width: 6px;
 }
 
 .output::-webkit-scrollbar-track {
-  background: var(--bg);
+  background: var(--bg-input);
 }
 
 .output::-webkit-scrollbar-thumb {
@@ -380,5 +411,31 @@
 }
 
 .output::-webkit-scrollbar-thumb:hover {
-  background: var(--text-dim);
+  background: var(--text-muted);
+}
+
+/* ============================================================
+   Responsive
+   ============================================================ */
+@media (max-width: 640px) {
+  .app {
+    padding: 24px 16px 48px;
+  }
+
+  .header h1 {
+    font-size: 32px;
+  }
+
+  .panel {
+    padding: 20px;
+  }
+
+  .controls-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .model-info-bar {
+    font-size: 11px;
+  }
 }

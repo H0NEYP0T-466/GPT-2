@@ -11,7 +11,7 @@ from contextlib import asynccontextmanager
 
 # Add backend dir to path so we can import GPT2
 sys.path.insert(0, os.path.dirname(__file__))
-from GPT2 import GPT2, GPT2Config, get_device, DATASET_PATH
+from GPT2 import GPT2, GPT2Config, DATASET_PATH
 
 MODEL_DIR = os.path.join(os.path.dirname(__file__), "model")
 MODEL_SAVE_PATH = os.path.join(MODEL_DIR, "model.pt")
@@ -32,15 +32,23 @@ training_state = {
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     global model, device, encoding
-    device = get_device()
+    device =torch.device("cuda" if torch.cuda.is_available() else "cpu")
     encoding = tiktoken.get_encoding("gpt2")
 
     os.makedirs(MODEL_DIR, exist_ok=True)
 
     if os.path.exists(MODEL_SAVE_PATH):
+        # Peek at the saved state_dict to figure out the block_size it was trained with.
+        # Saved models carry their own block_size in the wpe.weight shape.
+        sd = torch.load(MODEL_SAVE_PATH, map_location="cpu", weights_only=True)
+        wpe_shape = sd["transformer.wpe.weight"].shape
+        saved_block_size = wpe_shape[0]
+        print(f"Saved model uses block_size={saved_block_size} (wpe.weight shape: {wpe_shape})")
+        config = GPT2Config(block_size=saved_block_size)
+
         print(f"Loading trained model from {MODEL_SAVE_PATH}...")
-        model = GPT2(GPT2Config())
-        model.load(MODEL_SAVE_PATH)
+        model = GPT2(config)
+        model.load_state_dict(sd)
     else:
         print("No trained model found. Loading pretrained GPT-2 weights as fallback...")
         model = GPT2.from_pretrained("gpt2")
@@ -214,4 +222,4 @@ def train_status():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8011)

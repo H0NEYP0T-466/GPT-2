@@ -20,14 +20,6 @@ interface HealthStatus {
   model_exists: boolean;
 }
 
-interface TrainStatus {
-  is_training: boolean;
-  current_iteration: number;
-  total_iterations: number;
-  current_loss: number;
-  losses: number[];
-}
-
 function App() {
   const [prompt, setPrompt] = useState("Once upon a time, in a land far, far away,");
   const [maxTokens, setMaxTokens] = useState(100);
@@ -40,20 +32,12 @@ function App() {
 
   const [modelInfo, setModelInfo] = useState<ModelInfo | null>(null);
   const [health, setHealth] = useState<HealthStatus | null>(null);
-  const [trainStatus, setTrainStatus] = useState<TrainStatus | null>(null);
-
-  const [trainIterations, setTrainIterations] = useState(50);
-  const [isTraining, setIsTraining] = useState(false);
-  const [trainLosses, setTrainLosses] = useState<number[]>([]);
 
   const outputRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     fetchHealth();
     fetchModelInfo();
-    fetchTrainStatus();
-    const interval = setInterval(fetchTrainStatus, 2000);
-    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
@@ -81,22 +65,6 @@ function App() {
       }
     } catch {
       setModelInfo(null);
-    }
-  }
-
-  async function fetchTrainStatus() {
-    try {
-      const res = await fetch("/api/train/status");
-      if (res.ok) {
-        const data = await res.json();
-        setTrainStatus(data);
-        setIsTraining(data.is_training);
-        if (data.losses?.length > 0) {
-          setTrainLosses(data.losses);
-        }
-      }
-    } catch {
-      // ignore
     }
   }
 
@@ -178,25 +146,6 @@ function App() {
     }
   }
 
-  async function handleTrain() {
-    if (isTraining) return;
-    setIsTraining(true);
-    setTrainLosses([]);
-
-    try {
-      await fetch("/api/train", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ iterations: trainIterations }),
-      });
-      fetchTrainStatus();
-    } catch (err) {
-      console.error("Training failed:", err);
-    } finally {
-      setIsTraining(false);
-    }
-  }
-
   function formatParams(n: number): string {
     if (n >= 1e9) return (n / 1e9).toFixed(1) + "B";
     if (n >= 1e6) return (n / 1e6).toFixed(1) + "M";
@@ -208,7 +157,7 @@ function App() {
     <div className="app">
       <header className="header">
         <h1>GPT-2</h1>
-        <p className="subtitle">From scratch, following Andrej Karpathy</p>
+        <p className="subtitle">A minimal GPT-2 implementation from scratch</p>
         {health && (
           <div className={`status-badge ${health.model_loaded ? "online" : "offline"}`}>
             {health.model_loaded ? "Model loaded" : "Model not loaded"}
@@ -228,182 +177,94 @@ function App() {
           </div>
         )}
 
-        <div className="panels">
-          <section className="panel generate-panel">
-            <h2>Generate</h2>
-            <div className="input-group">
-              <label>Prompt</label>
-              <textarea
-                value={prompt}
-                onChange={(e) => setPrompt(e.target.value)}
-                rows={3}
-                placeholder="Enter your prompt..."
-              />
-            </div>
+        <section className="panel generate-panel">
+          <h2>Generate</h2>
+          <div className="input-group">
+            <label>Prompt</label>
+            <textarea
+              value={prompt}
+              onChange={(e) => setPrompt(e.target.value)}
+              rows={3}
+              placeholder="Enter your prompt..."
+            />
+          </div>
 
-            <div className="controls-row">
-              <div className="input-group small">
-                <label>Max tokens</label>
-                <input
-                  type="number"
-                  value={maxTokens}
-                  onChange={(e) => setMaxTokens(Number(e.target.value))}
-                  min={1}
-                  max={1024}
-                />
-              </div>
-              <div className="input-group small">
-                <label>Temperature</label>
-                <input
-                  type="number"
-                  value={temperature}
-                  onChange={(e) => setTemperature(Number(e.target.value))}
-                  min={0.1}
-                  max={2.0}
-                  step={0.1}
-                />
-              </div>
-              <div className="input-group small">
-                <label>Top-k</label>
-                <input
-                  type="number"
-                  value={topK}
-                  onChange={(e) => setTopK(Number(e.target.value))}
-                  min={1}
-                  max={50257}
-                />
-              </div>
-            </div>
-
-            <div className="button-row">
-              <button
-                className="btn primary"
-                onClick={handleGenerate}
-                disabled={isGenerating || isStreaming}
-              >
-                {isGenerating ? "Generating..." : "Generate"}
-              </button>
-              <button
-                className="btn secondary"
-                onClick={handleStreamGenerate}
-                disabled={isGenerating || isStreaming}
-              >
-                {isStreaming ? "Streaming..." : "Stream Generate"}
-              </button>
-            </div>
-
-            <div className="output" ref={outputRef}>
-              {streamingText && (
-                <div className="generation streaming">
-                  <span className="generation-text">{streamingText}</span>
-                  <span className="cursor">|</span>
-                </div>
-              )}
-              {generations.map((text, i) => (
-                <div key={i} className="generation">
-                  <span className="generation-label">#{generations.length - i}</span>
-                  <span className="generation-text">{text}</span>
-                </div>
-              ))}
-              {!streamingText && generations.length === 0 && (
-                <div className="placeholder">
-                  Generated text will appear here. This is a randomly initialized GPT-2
-                  model trained on Shakespeare's Coriolanus — output will be rough until
-                  more training is done.
-                </div>
-              )}
-            </div>
-          </section>
-
-          <section className="panel train-panel">
-            <h2>Train on Shakespeare</h2>
-            <p className="train-desc">
-              Fine-tune the model on Coriolanus (Act 1, Scene 1). Training from
-              scratch on this tiny dataset produces Shakespeare-ish gibberish —
-              that's the point.
-            </p>
-
+          <div className="controls-row">
             <div className="input-group small">
-              <label>Iterations</label>
+              <label>Max tokens</label>
               <input
                 type="number"
-                value={trainIterations}
-                onChange={(e) => setTrainIterations(Number(e.target.value))}
+                value={maxTokens}
+                onChange={(e) => setMaxTokens(Number(e.target.value))}
                 min={1}
-                max={10000}
+                max={1024}
               />
             </div>
+            <div className="input-group small">
+              <label>Temperature</label>
+              <input
+                type="number"
+                value={temperature}
+                onChange={(e) => setTemperature(Number(e.target.value))}
+                min={0.1}
+                max={2.0}
+                step={0.1}
+              />
+            </div>
+            <div className="input-group small">
+              <label>Top-k</label>
+              <input
+                type="number"
+                value={topK}
+                onChange={(e) => setTopK(Number(e.target.value))}
+                min={1}
+                max={50257}
+              />
+            </div>
+          </div>
 
+          <div className="button-row">
             <button
               className="btn primary"
-              onClick={handleTrain}
-              disabled={isTraining}
+              onClick={handleGenerate}
+              disabled={isGenerating || isStreaming}
             >
-              {isTraining
-                ? `Training... ${trainStatus?.current_iteration || 0}/${trainStatus?.total_iterations || 0}`
-                : "Start Training"}
+              {isGenerating ? "Generating..." : "Generate"}
             </button>
+            <button
+              className="btn secondary"
+              onClick={handleStreamGenerate}
+              disabled={isGenerating || isStreaming}
+            >
+              {isStreaming ? "Streaming..." : "Stream Generate"}
+            </button>
+          </div>
 
-            {trainStatus?.is_training && (
-              <div className="train-progress">
-                <div className="progress-bar">
-                  <div
-                    className="progress-fill"
-                    style={{
-                      width: `${((trainStatus.current_iteration / trainStatus.total_iterations) * 100)}%`,
-                    }}
-                  />
-                </div>
-                <span className="loss">
-                  Loss: {trainStatus.current_loss.toFixed(4)}
-                </span>
+          <div className="output" ref={outputRef}>
+            {streamingText && (
+              <div className="generation streaming">
+                <span className="generation-text">{streamingText}</span>
+                <span className="cursor">|</span>
               </div>
             )}
-
-            {trainLosses.length > 0 && (
-              <div className="loss-chart">
-                <h3>Training Loss</h3>
-                <div className="chart">
-                  {trainLosses.map((loss, i) => {
-                    const maxLoss = Math.max(...trainLosses);
-                    const height = maxLoss > 0 ? (loss / maxLoss) * 100 : 0;
-                    return (
-                      <div
-                        key={i}
-                        className="bar"
-                        style={{ height: `${height}%` }}
-                        title={`Iter ${i + 1}: ${loss.toFixed(4)}`}
-                      />
-                    );
-                  })}
-                </div>
-                <div className="chart-labels">
-                  <span>1</span>
-                  <span>{trainLosses.length}</span>
-                </div>
+            {generations.map((text, i) => (
+              <div key={i} className="generation">
+                <span className="generation-label">#{generations.length - i}</span>
+                <span className="generation-text">{text}</span>
+              </div>
+            ))}
+            {!streamingText && generations.length === 0 && (
+              <div className="placeholder">
+                Generated text will appear here. Enter a prompt and press Generate
+                to see the model continue the text.
               </div>
             )}
-
-            <div className="dataset-info">
-              <h3>Dataset</h3>
-              <p>Shakespeare — Coriolanus, Act 1, Scene 1</p>
-              <p>The classic Karpathy "Let's build GPT" training text.</p>
-            </div>
-          </section>
-        </div>
+          </div>
+        </section>
       </main>
 
       <footer className="footer">
-        <p>
-          Built following{" "}
-          <a
-            href="https://www.youtube.com/watch?v=kCc8FmEb1nY"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Andrej Karpathy's "Let's build GPT from scratch"
-          </a>
-        </p>
+        <p>GPT-2 API — built with FastAPI and React</p>
       </footer>
     </div>
   );
