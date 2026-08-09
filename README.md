@@ -345,12 +345,12 @@ _No dedicated dev dependencies in requirements.txt. The backend venv is used for
 #### JavaScript / TypeScript (Frontend)
 
 ![vite](https://img.shields.io/npm/v/vite?style=for-the-badge&label=vite) — Build tool and dev server.
-[@vitejs/plugin-react](https://img.shields.io/npm/v/@vitejs/plugin-react?style=for-the-badge&label=@vitejs/plugin-react) — Vite plugin for React Fast Refresh.
+![@vitejs/plugin-react](https://img.shields.io/npm/v/@vitejs/plugin-react?style=for-the-badge&label=@vitejs/plugin-react) — Vite plugin for React Fast Refresh.
 ![typescript](https://img.shields.io/npm/v/typescript?style=for-the-badge&label=typescript) — TypeScript compiler.
 ![oxlint](https://img.shields.io/npm/v/oxlint?style=for-the-badge&label=oxlint) — Fast Rust-based linter.
-[@types/node](https://img.shields.io/npm/v/@types/node?style=for-the-badge&label=@types/node) — Node.js type definitions.
-[@types/react](https://img.shields.io/npm/v/@types/react?style=for-the-badge&label=@types/react) — React type definitions.
-[@types/react-dom](https://img.shields.io/npm/v/@types/react-dom?style=for-the-badge&label=@types/react-dom) — React DOM type definitions.
+![@types/node](https://img.shields.io/npm/v/@types/node?style=for-the-badge&label=@types/node) — Node.js type definitions.
+![@types/react](https://img.shields.io/npm/v/@types/react?style=for-the-badge&label=@types/react) — React type definitions.
+![@types/react-dom](https://img.shields.io/npm/v/@types/react-dom?style=for-the-badge&label=@types/react-dom) — React DOM type definitions.
 
 ### Peer / Optional Dependencies
 
