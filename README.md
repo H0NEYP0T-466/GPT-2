@@ -29,6 +29,12 @@ A minimal GPT-2 implementation from scratch, featuring a FastAPI backend for tex
 
 </p>
 
+<p align="center">
+  <img src="visual/arc.png" alt="GPT-2 Architecture Diagram" width="80%" />
+  <br>
+  <em>GPT-2 (124M) architecture — 12 layers, 12 heads, 768 embedding dim, causal transformer decoder stack</em>
+</p>
+
 A lightweight, from-scratch reimplementation of OpenAI's GPT-2 architecture (124M parameters) with a FastAPI-powered REST API and a React-based UI. Train the model on your own dataset, stream generated text in real time, and inspect model internals — all from a single command.
 
 ---
