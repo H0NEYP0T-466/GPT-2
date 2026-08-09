@@ -1,5 +1,15 @@
+// API base URL — empty string means relative (works in dev via vite proxy).
+// In production (Vercel etc.), set VITE_API_BASE_URL to your backend host,
+// e.g. "https://your-backend.onrender.com" (no trailing slash).
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
+
+const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
+
+
+function api(path: string): string {
+  return API_BASE ? `${API_BASE}${path}` : path;
+}
 
 interface ModelInfo {
   total_parameters: number;
