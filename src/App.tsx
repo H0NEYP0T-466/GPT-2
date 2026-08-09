@@ -1,14 +1,10 @@
 import { useState, useRef, useEffect } from "react";
 import "./App.css";
 
-// API base URL — empty string means relative (works in dev via vite proxy).
-// In production (Vercel etc.), set VITE_API_BASE_URL to your backend host,
-// e.g. "https://your-backend.onrender.com" (no trailing slash).
-const API_BASE = import.meta.env.VITE_API_BASE_URL || "";
-
-function api(path: string): string {
-  return API_BASE ? `${API_BASE}${path}` : path;
-}
+// Backend runs locally on your machine. In production (Vercel), the browser
+// still calls this URL — which resolves to YOUR localhost since the request
+// originates from your browser, not from Vercel's servers.
+const API = "http://localhost:8011";
 
 interface ModelInfo {
   total_parameters: number;
@@ -57,7 +53,7 @@ function App() {
 
   async function fetchHealth() {
     try {
-      const res = await fetch(api("/api/health"));
+      const res = await fetch(`${API}/api/health`);
       const data = await res.json();
       setHealth(data);
     } catch {
@@ -67,7 +63,7 @@ function App() {
 
   async function fetchModelInfo() {
     try {
-      const res = await fetch(api("/api/model/info"));
+      const res = await fetch(`${API}/api/model/info`);
       if (res.ok) {
         const data = await res.json();
         setModelInfo(data);
@@ -83,7 +79,7 @@ function App() {
     setStreamingText("");
 
     try {
-      const res = await fetch(api("/api/generate"), {
+      const res = await fetch(`${API}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -109,7 +105,7 @@ function App() {
     setStreamingText("");
 
     try {
-      const res = await fetch(api("/api/generate/stream"), {
+      const res = await fetch(`${API}/api/generate/stream`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

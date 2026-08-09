@@ -1,0 +1,91 @@
+name: "Bug report"
+description: "Report a reproducible problem with GPT-2"
+labels: ["bug"]
+title: "[Bug]: "
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report! Before you submit, please search the [existing issues](https://github.com/H0NEYP0T-466/GPT-2/issues) to make sure this hasn't been reported already.
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: A clear, one-sentence description of the bug.
+      placeholder: e.g., Generation fails with "CUDA out of memory" on larger prompts
+    validations:
+      required: true
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce
+      description: Exact, ordered steps to trigger the bug.
+      placeholder: |
+        1. Start the backend and frontend...
+        2. Enter a prompt of length > 500 characters...
+        3. Click Generate with max_new_tokens=500...
+        4. Observe...
+    validations:
+      required: true
+  - type: textarea
+    id: expected-behavior
+    attributes:
+      label: Expected Behavior
+      description: What should have happened.
+      placeholder: Text is generated successfully and displayed in the output panel.
+    validations:
+      required: true
+  - type: textarea
+    id: actual-behavior
+    attributes:
+      label: Actual Behavior
+      description: What actually happened. Include any error messages, logs, or screenshots.
+      placeholder: The API returns a 500 error with "CUDA out of memory" in the server logs.
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Details about your setup.
+      placeholder: |
+        - OS: e.g., Ubuntu 24.04, macOS 15, Windows 11
+        - Python version: e.g., 3.11.5
+        - Node.js version: e.g., 20.10.0
+        - GPU: e.g., NVIDIA RTX 4090 (24GB VRAM), CPU only
+        - Browser: e.g., Chrome 125, Firefox 126
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs
+      description: Copy and paste any relevant server or browser console logs. This will be automatically formatted as code.
+      render: shell
+    validations:
+      required: false
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots (Optional)
+      description: If applicable, add screenshots to help explain the problem. Drag and drop images here.
+    validations:
+      required: false
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How severely does this bug affect you?
+      options:
+        - Low (minor inconvenience, workaround exists)
+        - Medium (significant issue, blocks some functionality)
+        - High (critical bug, core functionality broken)
+    validations:
+      required: true
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Any other context, references, or information you think might be helpful.
+    validations:
+      required: false
