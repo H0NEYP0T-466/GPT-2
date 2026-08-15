@@ -1,7 +1,6 @@
 # GPT-2
 
 A minimal GPT-2 implementation from scratch, featuring a FastAPI backend for text generation and training, paired with a modern React + TypeScript frontend for an interactive experience.
-
 <p align="center">
 
   <!-- Core -->
